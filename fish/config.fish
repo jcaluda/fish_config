@@ -11,8 +11,17 @@ function reload
     end
 end
 
+function start_tmux
+    if type tmux > /dev/null
+        #if not inside a tmux session, and if no session is started, start a new session
+        if test -z "$TMUX" ; and test -z $TERMINAL_CONTEXT
+            tmux -2 attach; or tmux -2 new-session
+        end
+    end
+end
+
 if test -f ~/.dircolors/dircolors.ansi-dark
     set -gx LS_COLORS (dircolors -c ~/.dircolors/dircolors.ansi-dark | string replace -r 'setenv LS_COLORS \'(.*)\'' '$1')
 end
 
-set -g theme_display_date no
+start_tmux
