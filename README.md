@@ -19,11 +19,19 @@ sudo apt update && sudo apt upgrade
 sudo apt install fish
 ```
 
-## 2. Install the font
+## 2. Install Tmux (optional)
+
+Install Tmux if you want terminal multiplexing support:
+
+```bash
+sudo apt install tmux
+```
+
+## 3. Install the font
 
 Install the font from the `fonts/` folder on the Windows side. Use the Windows font installer to add it to your system.
 
-## 3. Configure Windows Terminal
+## 4. Configure Windows Terminal
 
 Update the Ubuntu profile in Windows Terminal with these appearance settings:
 
@@ -32,7 +40,7 @@ Update the Ubuntu profile in Windows Terminal with these appearance settings:
 - Color scheme: `Ottosson`
 - Background color: `#002B36`
 
-## 4. Install the Fish configuration
+## 5. Install the Fish configuration
 
 Copy the contents of the `fish/` folder into your WSL Fish config directory:
 
@@ -45,6 +53,18 @@ If you already have an existing Fish configuration, back it up first:
 ```bash
 mv ~/.config/fish ~/.config/fish.backup
 ```
+
+## 6. Install the tmux config (optional)
+
+If a `tmux` configuration is present, copy it to your home directory:
+
+```bash
+cp tmux/.tmux.conf ~/
+```
+
+## 7. Restart WSL
+
+Restart WSL or open a new Ubuntu terminal session so the new shell and config load correctly.
 
 ## Notes
 
