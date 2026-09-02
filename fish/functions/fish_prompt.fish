@@ -7,6 +7,12 @@ set -g __fish_git_prompt_showcolorhints yes
 set -g __fish_git_prompt_showupstream none
 set -g __fish_git_prompt_color_cleanstate green
 
+if test -r /etc/os-release
+  and command grep -q '^ID=ubuntu$' /etc/os-release
+  and string match -qi '*kde*' "$XDG_CURRENT_DESKTOP" "$XDG_SESSION_DESKTOP" "$DESKTOP_SESSION"
+  set -g __fish_git_prompt_char_cleanstate \uE63F
+end
+
 # Change default characters
 set -g __fish_git_prompt_char_dirtystate '*'
 set -g __fish_git_prompt_char_stagedstate '+'

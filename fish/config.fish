@@ -7,6 +7,7 @@ set -U fish_prompt_pwd_dir_length 0
 
 function reload
     if source ~/.config/fish/config.fish
+        source ~/.config/fish/functions/fish_prompt.fish
         echo "config.fish reloaded"
     end
 end
