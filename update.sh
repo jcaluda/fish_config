@@ -4,6 +4,11 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+if [[ ! -r /etc/os-release ]] || ! grep -qE '^(ID|ID_LIKE)=.*(ubuntu|debian)' /etc/os-release; then
+    echo "This script requires a Debian-based Linux distribution (Ubuntu or Kubuntu)." >&2
+    exit 1
+fi
+
 echo "=== Fish Config Update Script ==="
 echo "Repository: $REPO_ROOT"
 echo ""

@@ -4,7 +4,36 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-echo "=== Fish Config Installation Script for WSL 2.0 Ubuntu ==="
+if [[ ! -r /etc/os-release ]] || ! grep -qE '^(ID|ID_LIKE)=.*(ubuntu|debian)' /etc/os-release; then
+    echo "This script requires a Debian-based Linux distribution (Ubuntu or Kubuntu)." >&2
+    exit 1
+fi
+
+if ! command -v apt-get &> /dev/null; then
+    echo "apt-get is required to install Fish and Tmux." >&2
+    exit 1
+fi
+
+SUDO_CMD=()
+if (( EUID != 0 )); then
+    if ! command -v sudo &> /dev/null; then
+        echo "sudo is required when this script is not run as root." >&2
+        exit 1
+    fi
+    SUDO_CMD=(sudo)
+fi
+
+IS_WSL=false
+if [[ -n "${WSL_INTEROP:-}" ]] || grep -qiE 'microsoft|wsl' /proc/version 2>/dev/null; then
+    IS_WSL=true
+fi
+
+echo "=== Fish Config Installation Script ==="
+if [[ "$IS_WSL" == true ]]; then
+    echo "Platform: WSL"
+else
+    echo "Platform: Debian-based Linux"
+fi
 echo "Repository: $REPO_ROOT"
 echo ""
 
@@ -14,11 +43,11 @@ if command -v fish &> /dev/null; then
     echo "Fish is already installed ($(fish --version))"
 else
     echo "Adding Fish PPA..."
-    sudo apt-add-repository -y ppa:fish-shell/release-4
+    "${SUDO_CMD[@]}" apt-add-repository -y ppa:fish-shell/release-4
     echo "Updating package list..."
-    sudo apt update
+    "${SUDO_CMD[@]}" apt-get update
     echo "Installing Fish..."
-    sudo apt install -y fish
+    "${SUDO_CMD[@]}" apt-get install -y fish
     echo "Fish installed: $(fish --version)"
 fi
 echo ""
@@ -31,7 +60,7 @@ else
     read -p "Install Tmux? [y/N] " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-        sudo apt install -y tmux
+        "${SUDO_CMD[@]}" apt-get install -y tmux
         echo "Tmux installed: $(tmux -V)"
     else
         echo "Skipping Tmux installation."
@@ -85,40 +114,32 @@ else
 fi
 echo ""
 
-# Step 5: Font installation instructions
-echo "Step 5: Font installation (MANUAL - must be done on Windows side)"
-echo "================================================================="
-echo "The Powerline font must be installed on Windows (not in WSL)."
-echo "Font file: $REPO_ROOT/fonts/DejaVu Sans Mono for Powerline.ttf"
-echo ""
-echo "To install:"
-echo "1. Open File Explorer and navigate to: \\\\wsl$\\Ubuntu\\home\\$USER\\repos\\fish_config\\fonts\\"
-echo "   (or copy the font file to Windows first)"
-echo "2. Double-click 'DejaVu Sans Mono for Powerline.ttf'"
-echo "3. Click 'Install' in the font preview window"
-echo ""
-
-# Step 6: Windows Terminal configuration instructions
-echo "Step 6: Windows Terminal Configuration (MANUAL)"
-echo "================================================="
-echo "Update the Ubuntu profile in Windows Terminal with these settings:"
-echo "  - Font face: DejaVu Sans Mono for Powerline"
-echo "  - Font size: 11"
-echo "  - Color scheme: Ottosson"
-echo "  - Background color: #002B36"
-echo ""
-echo "To configure:"
-echo "1. Open Windows Terminal settings (Ctrl+,)"
-echo "2. Select 'Ubuntu' profile"
-echo "3. Go to Appearance tab"
-echo "4. Apply the settings above"
-echo ""
-
-# Step 7: Final instructions
-echo "Step 7: Final Steps"
-echo "==================="
-echo "1. Restart WSL: wsl --shutdown (run in PowerShell/CMD)"
-echo "2. Open a new Ubuntu terminal in Windows Terminal"
-echo "3. Fish should start automatically with the new configuration"
+if [[ "$IS_WSL" == true ]]; then
+    echo "Step 5: Font installation (MANUAL - Windows side)"
+    echo "==============================================="
+    echo "Install this font in Windows:"
+    echo "  $REPO_ROOT/fonts/DejaVu Sans Mono for Powerline.ttf"
+    echo ""
+    echo "Step 6: Windows Terminal Configuration (MANUAL)"
+    echo "================================================="
+    echo "Update the Ubuntu profile with these settings:"
+    echo "  - Font face: DejaVu Sans Mono for Powerline"
+    echo "  - Font size: 11"
+    echo "  - Color scheme: Ottosson"
+    echo "  - Background color: #002B36"
+    echo ""
+    echo "Step 7: Final Steps"
+    echo "==================="
+    echo "Open a new WSL terminal session to load the configuration."
+else
+    echo "Step 5: Font installation (MANUAL)"
+    echo "==================================="
+    echo "Install this font using your desktop environment:"
+    echo "  $REPO_ROOT/fonts/DejaVu Sans Mono for Powerline.ttf"
+    echo ""
+    echo "Step 6: Final Steps"
+    echo "==================="
+    echo "Open a new terminal session to load the configuration."
+fi
 echo ""
 echo "=== Installation Complete ==="
