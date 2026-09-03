@@ -36,7 +36,7 @@ sudo apt install fish
 Install Tmux if you want terminal multiplexing support. The install script asks whether it should install Tmux.
 
 ```bash
-sudo apt install tmux
+sudo apt install tmux xclip
 ```
 
 ## 3. Install the font
